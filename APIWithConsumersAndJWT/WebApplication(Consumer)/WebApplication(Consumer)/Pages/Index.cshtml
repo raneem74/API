@@ -1,0 +1,222 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(
+            function () {
+                $.ajax({
+                    url: "https://localhost:7288/api/Departments",
+                    method: 'GET',
+                    success: function (data) {
+                        console.log(JSON.stringify(data))
+                        //alert(JSON.stringify(data))
+                    },
+                    error: function (error) {
+                        alert("Error")
+                    }
+
+                })
+            }
+        )
+
+    </script> 
+
+</head>
+
+<body>
+    <div class="mx-5 p-5">
+        <label for="Name">Id:</label>
+        <input type="number" id="Name" name="Id" /><br><br>
+
+        <label for="Name">Name:</label>
+        <input type="text" id="Name" name="Name" /><br><br>
+
+        <label for="Location">Location:</label>
+        <input type="text" id="Location" name="Location" /><br><br>
+
+        <label for="Branches">Branches:</label>
+        <input type="text" id="Branches" name="Branches" /><br><br>
+
+        <label for="Description">Description:</label>
+        <input type="text" id="Description" name="Description" /><br><br>
+
+
+        <input type="button" class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" value="Add" onclick="AddDept()" />
+        <input type="button" class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" value="Search ID" onclick="GetByID()" />
+        <input type="button" class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" value="Update" onclick="UpdateDept()" />
+        <input type="button" class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" value="Delete" onclick="DeleteDept()" />
+        <input type="button" class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" value="Get All" onclick="GetAllDepts()" />
+        <br><br>
+
+        <div id="table-container"></div>
+    </div>
+    <script>
+        function AddDept() {
+            $.ajax({
+                url: "https://localhost:7288/api/Departments",
+                method: 'Post',
+                contentType: "Application/Json",
+                data: JSON.stringify({
+                    //id: $("input[name='Id']").val(),
+                    name: $("input[name='Name']").val(),
+                    location: $("input[name='Location']").val(),
+                    branches: $("input[name='Branches']").val(),
+                    description: $("input[name='Description']").val()
+                }),
+                success: function (data) {
+                    alert("Data saved successfully")
+                },
+                error: function (error) {
+                    alert("Error")
+                }
+
+            })
+        };
+
+        function UpdateDept() {
+
+            // link API put method and send data
+            $.ajax({
+                url: "https://localhost:7288/api/Departments/" + $("input[name='Id']").val(),
+                method: "Put",
+                contentType: "Application/Json",
+                data: JSON.stringify({
+                    id: $("input[name='Id']").val(),
+                    name: $("input[name='Name']").val(),
+                    location: $("input[name='Location']").val(),
+                    branches: $("input[name='Branches']").val(),
+                    description: $("input[name='Description']").val()
+                }),
+                //data: obj,
+                success: function (result) {
+                    alert("Added");
+                },
+                Error: function (e) {
+                    alert(e.responseText);
+                }
+            });
+        };
+
+        function GetAllDepts() {
+            $(
+                function () {
+                    $.ajax({
+                        url: "https://localhost:7288/api/Departments",
+                        method: 'GET',
+                        success: function (data) {
+                            // Create a table element
+                            var table = document.createElement("table");
+                            table.style.borderCollapse = "collapse";
+                            table.style.width = "100%";
+
+                            // Create a header row
+                            var headerRow = document.createElement("tr");
+
+                            // Create header cells
+                            var headers = ["ID", "Name", "Location", "Branches", "Description"];
+                            for (var i = 0; i < headers.length; i++) {
+                                var headerCell = document.createElement("th");
+                                headerCell.style.border = "1px solid #ddd";
+                                headerCell.style.padding = "8px";
+                                headerCell.textContent = headers[i];
+                                headerRow.appendChild(headerCell);
+                            }
+                            table.appendChild(headerRow);
+
+                            // Create a row for each data object
+                            for (var i = 0; i < data.length; i++) {
+                                var rowData = data[i];
+                                var row = document.createElement("tr");
+                                row.style.backgroundColor = i % 2 === 0 ? "#f2f2f2" : "#fff";
+
+                                // Create cells for each property of the object
+                                for (var key in rowData) {
+                                    var cell = document.createElement("td");
+                                    cell.style.border = "1px solid #ddd";
+                                    cell.style.padding = "8px";
+                                    cell.textContent = rowData[key];
+                                    row.appendChild(cell);
+                                }
+
+                                table.appendChild(row);
+                            }
+
+                            // Get the table container element
+                            var tableContainer = document.getElementById("table-container");
+
+                            // Clear the children of the table container
+                            tableContainer.innerHTML = "";
+
+                            // Append the new table to the table container
+                            tableContainer.appendChild(table);
+
+                          
+
+                            // Add the table to the HTML body
+                            document.getElementById("table-container").innerHTML = "";
+                            document.getElementById("table-container").appendChild(table);
+                        },
+                        error: function (error) {
+                            alert("Error")
+                        }
+
+                    })
+                }
+            )
+        };
+
+        function DeleteDept() {
+            $.ajax({
+                url: "https://localhost:7288/api/Departments/" + $("input[name='Id']").val(),
+                type: 'DELETE',
+                success: function (result) {
+                    GetAllDepts();
+                    alert("Deleted");
+                },
+                error: function (e) { alert("Error in deleting"); }
+
+            });
+        };
+
+        function GetByID() {
+            $.ajax({
+                url: "https://localhost:7288/api/Departments/" + $("input[name='Id']").val(),
+                method: 'GET',
+                success: function (data) {
+                    // create new table element
+                    var table = $('<table class="table table-bordered">');
+
+                    // create header row
+                    var headerRow = $('<tr class="thead-dark">');
+                    headerRow.append($('<th>').text('Id'));
+                    headerRow.append($('<th>').text('Name'));
+                    headerRow.append($('<th>').text('Description'));
+                    headerRow.append($('<th>').text('Location'));
+                    headerRow.append($('<th>').text('Branches'));
+                    table.append(headerRow);
+
+                    // create data row
+                        var dataRow = $('<tr>');
+                        dataRow.append($('<td>').text(data.id));
+                        dataRow.append($('<td>').text(data.name));
+                        dataRow.append($('<td>').text(data.description));
+                        dataRow.append($('<td>').text(data.location));
+                        dataRow.append($('<td>').text(data.branches));
+                        table.append(dataRow);
+                    
+
+                    // add table to container element
+                    $('#table-container').empty().append(table);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('AJAX request failed: ' + textStatus + ', ' + errorThrown);
+                }
+
+            });
+        };
+    </script>
+</body>

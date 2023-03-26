@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\Departments(ToUseByConsumer).props" />
+</Project>
